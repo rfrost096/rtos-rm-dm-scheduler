@@ -2,9 +2,11 @@
 
 **Code available upon request** (Starter code is protected IP)
 
+## Summary
+
 This project extends the FreeRTOS kernel on an ATmega2560 (Arduino Mega) with custom scheduling capabilities, advanced profiling, and real-time execution tracking. It implements custom scheduling policies and provides a robust framework for monitoring task deadlines and execution times.
 
-## Key Features
+### Key Features
 
 *   **Custom Scheduling Algorithms:** Implements static priority scheduling based on Rate Monotonic (RM) and Deadline Monotonic (DM) policies.
 *   **Execution Time Tracking:** Monitors Worst-Case Execution Time (WCET) on a tick-by-tick basis, detecting tasks that exceed their allocated execution time and suspending them safely to protect overall system schedulability.
@@ -12,7 +14,11 @@ This project extends the FreeRTOS kernel on an ATmega2560 (Arduino Mega) with cu
 *   **High-Speed Serial Profiling:** Features a custom, low-overhead event tracking system. It records tick-by-tick CPU occupation, execution times, and scheduling overhead. 
 *   **Companion Diagnostic Tool:** Includes a C++ application (`reader.cpp`) designed to run on a host PC. This application catches the high-speed binary serial output from the microcontroller and decodes it into a human-readable, chronological event log for analysis.
 
-## High-Level Design Architecture
+---
+
+## Technical Details
+
+### High-Level Design Architecture
 
 To achieve these features while maintaining the integrity of the base FreeRTOS system and adhering to the constraints of an 8-bit microcontroller, several key design decisions were made:
 
@@ -20,11 +26,11 @@ To achieve these features while maintaining the integrity of the base FreeRTOS s
 2.  **Dedicated Scheduler Task:** To minimize the latency and overhead introduced in high-priority hardware interrupts, complex deadline checking and task recreation logic is offloaded from the system tick hook (`vApplicationTickHook`). Instead, a dedicated high-priority Scheduler Task is utilized. The tick hook simply wakes this scheduler at a defined periodic rate (e.g., every 100ms) to evaluate system health, process potential deadline misses, and manage suspended tasks.
 3.  **Lock-Free(ish) Serial Logging:** To prevent the profiling system from significantly altering the timing behavior it is meant to measure, the serial logging uses a highly optimized circular buffer. Events are recorded rapidly during critical sections. The actual transmission of this data is handled by a low-priority serial task that streams raw binary data at a high baud rate (115200) to ensure the buffer clears quickly without blocking vital system operations.
 
-## Build and Usage Instructions
+### Build and Usage Instructions
 
 This project is built using PlatformIO.
 
-### Firmware (ATmega2560)
+#### Firmware (ATmega2560)
 
 1.  Initialize and compile the firmware:
     ```bash
@@ -35,7 +41,7 @@ This project is built using PlatformIO.
     pio run --target upload --upload-port /dev/ttyACM0
     ```
 
-### Companion Serial Reader
+#### Companion Serial Reader
 
 1.  Compile the C++ reader application on your host machine:
     ```bash
@@ -47,6 +53,6 @@ This project is built using PlatformIO.
     ./reader_app /dev/ttyACM0
     ```
 
-## Disclaimer
+### Disclaimer
 
 This repository is maintained as an archived academic project to demonstrate embedded systems programming, real-time operating system concepts, and C++ application development. Specific assignment details and lower-level algorithmic implementations are kept abstract to protect intellectual property.
